@@ -161,7 +161,7 @@ $ kubectl get nodes
 
 On each worker node, use the kubeadm join command you noted down earlier after initializing the master node on step 6. It should look something like this:
 ```
-$ kubeadm join 172.31.13.164:6443 --token 6yhkqu.821gnlcer702ts8w \
+$ kubeadm join 192.168.1.173:6443 --token 6yhkqu.821gnlcer702ts8w \
         --discovery-token-ca-cert-hash sha256:7940e110a21c33f5f102ad46475be88e6e3090dc57c2a8a1b3b5a43a55b1eb1f
 ```
 
