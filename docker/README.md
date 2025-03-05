@@ -1,15 +1,15 @@
 
 # How to Set Up a Secure Private Docker Registry with Authentication and SSL
 
-Docker registries help you store and distribute container images/images. But what if you want to keep your images/images private and secure? This guide walks you through setting up your own private Docker registry with SSL encryption and user authentication so that only authorized users can access your container images/images.
+Docker registries help you store and distribute container images. But what if you want to keep your images private and secure? This guide walks you through setting up your own private Docker registry with SSL encryption and user authentication so that only authorized users can access your container images.
 
 ## 🚀 Why Set Up a Private Docker Registry?
 
-+ Security: Control access to your container images/images
++ Security: Control access to your container images
 
 + Speed: Faster deployments without relying on external registries
 
-+ Cost Savings: Reduce bandwidth costs from pulling images/images repeatedly
++ Cost Savings: Reduce bandwidth costs from pulling images repeatedly
 
 Let's get started! 🛠️
 
@@ -128,7 +128,7 @@ Run the Docker registry with SSL and authentication:
 docker run -d -p 5000:5000 --restart=always --name registry -v /certs:/certs -v /auth:/auth -v /var/lib/registry:/var/lib/registry -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -e REGISTRY_AUTH=htpasswd registry:2
 ```
 
-## Step 7: Verify Registry Access & images/image Operations
+## Step 7: Verify Registry Access & image Operations
 
 ✅ Login to the Private Registry
 
@@ -140,17 +140,17 @@ sample output:
 
 ![alt text](images/image-2.png)
 
-✅ Check Installed Docker images/images
+✅ Check Installed Docker images
 
 ```sh
-docker images/images
+docker images
 ```
 
 sample output:
 
 ![alt text](images/image-3.png)
 
-✅ Tag an images/image for the Private Registry
+✅ Tag an images for the Private Registry
 
 ```sh
 docker tag hello-world <ip_address>:5000/my-hello-world
@@ -160,7 +160,7 @@ sample output:
 
 ![alt text](images/image-4.png)
 
-✅ Push the images/image to the Private Registry
+✅ Push the images to the Private Registry
 
 ```sh
 docker push <ip_address>:5000/my-hello-world
@@ -170,7 +170,7 @@ sample output:
 
 ![alt text](images/image-5.png)
 
-✅ Remove Local images/image to Test Pulling
+✅ Remove Local images to Test Pulling
 
 ```sh
 docker rmi -i <images/image_id>
@@ -180,7 +180,7 @@ sample output:
 
 ![alt text](images/image-7.png)
 
-✅ Pull the images/image from the Private Registry
+✅ Pull the images from the Private Registry
 
 ```sh
 docker run -ti <ip_address>:5000/my-hello-world
@@ -198,7 +198,7 @@ docker logout
 
 ## Step 8: List All Repositories in Your Private Registry
 
-Retrieve a list of all stored images/images in the registry:
+Retrieve a list of all stored images in the registry:
 
 ```sh
 curl -u admin --location 'https://<ip_address>:5000/v2/_catalog' -k
@@ -210,4 +210,4 @@ sample output:
 
 ## 🎉 Conclusion
 
-You’ve successfully set up a secure private Docker registry with authentication and SSL! Now you can store, manage, and deploy your container images/images securely. 🚀
+You’ve successfully set up a secure private Docker registry with authentication and SSL! Now you can store, manage, and deploy your container images securely. 🚀
