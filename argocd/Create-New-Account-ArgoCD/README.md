@@ -1,119 +1,118 @@
-# Create a New User in Argo CD
+# How to Create a New User in Argo CD
 
-## Description
+This guide walks you through the process of creating a new user in Argo CD, configuring Role-Based Access Control (RBAC) permissions, and setting a password for secure access.
 
-This process will create a new user in Argo CD, configure RBAC permissions, and set a password for access.
+By following these steps, you will ensure that the new user has the appropriate permissions while maintaining the security and integrity of your Argo CD environment.
 
 ## Prerequisites
 
-+ Log in to the `Master` Server.
-+ Access the `argocd-server` pod.
++ Access to the Master server.
+
++ Permissions to interact with the argocd-server pod.
 
 
-## Setup
+## 1. Verify the Argo CD Server Pod Name
 
-### Verify the Name of the argocd-server Pod
-
-To find the name of the pod, run the following command:
+To identify the correct pod running the Argo CD server, execute the following command:
 
 ```bash
 kubectl get pods -n argocd
 ```
 
-Sample Output:
+Example Output:
 
 ![alt text](images/image.png)
 
-### Enter the argocd-server Pod
+## 2. Access the Argo CD Server Pod
 
-Once you have the pod name, use the following command to enter the argocd-server pod:
+Once you have identified the correct pod name, enter the pod's shell using:
 
 ```bash
 kubect exec -it argocd-server-56f7986dff-xv5k7 -n argocd /bin/bash
 ```
 
-### Log In to Argo CD
+## 3. Log In to Argo CD
 
-To log in to Argo CD, use the following command:
+To authenticate with Argo CD, use the following command:
 
 ```bash
 argocd login <url>:<port> --username <username> --password <password>
 ```
 
-Note: Replace the placeholders <url>, <port>, <username>, and <password> with the actual values for your Argo CD setup.
+Note: Replace <argo-cd-url>, <port>, <username>, and <password> with your actual Argo CD credentials.
 
-Sample Command:
+Example Output:
 
 ![alt text](images/image-1.png)
 
-### List All Accounts in Argo CD
+## 4. List Existing Argo CD Accounts
 
-To view all accounts in Argo CD, run:
+To view all existing accounts in Argo CD, run:
 
 ```bash
 argocd account list
 ```
 
-This command will display all available accounts in your Argo CD. For example, if only the admin account exists, you will see only that.
+This command will display all user accounts, including the default admin account.
 
 ![alt text](images/image-2.png)
 
-### Add a New Account
+## 5. Add a New User Account
 
-Argo CD uses a configmap to manage accounts. To add a new user, follow these steps:
+Argo CD manages users via a ConfigMap. Follow these steps to create a new user:
 
-Retrieve the ConfigMap
-
-First, get the argocd-cm ConfigMap:
+### Retrieve the ConfigMap
 
 ```bash
 kubectl get configmap argocd-cm -n argocd -o yaml > argocd-cm.yaml
 ```
 
-Edit the ConfigMap
+### Edit the ConfigMap
 
-Open the argocd-cm.yaml file and add the following line under the data section:
+Open the argocd-cm.yaml file and add the following entry under the data section:
 
 ```bash
 data:
   accounts.testuser: login
 ```
 
-For example:
+Example:
 
 ![alt text](images/image-3.png)
 
-Apply the Changes
+### Apply the Changes
 
-To apply the changes, run:
+Save the file and apply the changes using:
 
 ```bash
 kubectl apply -n argocd  -f argocd-cm.yaml
 ```
 
-### Verify the New Account
+## 6. Verify the New Account
 
-After applying the changes, enter the argocd-server pod again and check if the new account is listed:
+After applying the ConfigMap changes, check if the new user account appears in the list:
 
 ```bash
 argocd account list
 ```
 
-You should see the newly added account in the output.
+If successful, the new account will be visible in the output.
 
 ![alt text](images/image-4.png)
 
-### Configure RBAC (Role-Based Access Control)
+## 7. Configure RBAC (Role-Based Access Control)
 
-Next, configure RBAC for the new user. To do this, retrieve the argocd-rbac-cm ConfigMap:
+To assign appropriate permissions to the new user, modify the RBAC configuration.
+
+### Retrieve the RBAC ConfigMap
 
 ```bash
 kubectl get configmap argocd-rbac-cm -n argocd -o yaml > argocd-rbac-cm.yml
 ```
 
-Edit the RBAC ConfigMap
+### Edit the RBAC ConfigMap
 
-Open the argocd-rbac-cm.yml file, and for the newly created account, add a read-only access rule under the data section:
+Open argocd-rbac-cm.yml and add a role assignment under the data section:
 
 ```bash
 data:
@@ -126,26 +125,44 @@ Sample output:
 
 ![alt text](images/image-5.png)
 
-You can replace readonly with other permissions like readwrite, readexecute, or admin depending on the level of access you want to grant the account.
+Note:
 
-Apply the RBAC Changes
++ readonly grants view-only access.
 
-To apply the RBAC configuration, run:
++ Other roles include readwrite, readexecute, or admin, depending on the access level needed
+
+### Apply the RBAC Changes
+
+Save the file and apply the updated configuration:
 
 ```bash
 kubectl apply -n argocd -f argocd-rbac-cm.yml
 ```
 
-### Set a Password for the New Account
+## 8. Set a Password for the New User
 
-The final step is to create a password for the new account. To set a password, use the following command:
+To finalize the setup, create a password for the new account:
 
 ```bash
 argocd account update-password --account <new-account-name>
 ```
 
-Sample Output:
+Example Output:
 
 ![alt text](images/image-6.png)
 
-Once the password is set, you can use the account credentials to log in to the Argo CD UI and CLI.
+## 9. Confirm User Login
+
+To test the new account, log in using the newly created credentials:
+
+```bash
+argocd login <argo-cd-url>:<port> --username testuser --password <new-password>
+```
+
+If successful, the user will gain access based on the assigned RBAC permissions.
+
+## Conclusion
+
+You have successfully created a new user in Argo CD, assigned RBAC permissions, and configured authentication settings. This setup ensures controlled access while maintaining security best practices.
+
+For additional customization, you can modify the RBAC policies to fit specific user roles and project requirements.
