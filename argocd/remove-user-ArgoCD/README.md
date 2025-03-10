@@ -1,17 +1,24 @@
-# Removing a User in ArgoCD
+# Removing a User from ArgoCD
+
+As part of managing user access in ArgoCD, I recently needed to remove a user account to ensure proper security and access control. This guide walks through the step-by-step process I followed to completely remove a user from ArgoCD, including ConfigMap updates, RBAC modifications, and secret cleanup.
 
 ## Prerequisites
 
-+ Ensure you have access to the Master Server.
-+ You must have appropriate permissions to modify ArgoCD configurations.
+Before proceeding, I made sure that:
 
-## Setup
++ I had access to the Master Server where ArgoCD is deployed.
 
-### Access the ArgoCD Server Pod
++ I had sufficient permissions to modify ArgoCD configurations.
 
-Log in to the Master Server.
+## Step 1: Accessing the ArgoCD Server Pod
 
-Identify the ArgoCD server pod name by running:
+### 1.1 Logging into the Master Server
+
+First, I logged into the server where ArgoCD is running.
+
+### 1.2 Identifying the ArgoCD Server Pod
+
+To get the list of pods in the argocd namespace, I ran:
 
 ```bash
 kubectl get pods -n argocd
@@ -21,15 +28,19 @@ Expected Output:
 
 ![alt text](images/image.png)
 
-### Enter the ArgoCD server pod by executing:
+### 1.3 Entering the ArgoCD Server Pod
+
+To access the ArgoCD pod, I executed:
 
 ```bash
 kubectl exec -it argocd-server-56f7986dff-xv5k7 -n argocd /bin/bash
 ```
 
-### Log in to ArgoCD
+I replaced <argocd-server-pod-name> with the actual pod name from the previous command.
 
-Inside the ArgoCD pod, authenticate using:
+## Step 2: Authenticating with ArgoCD
+
+Once inside the ArgoCD pod, I logged in using my credentials:
 
 ```bash
 argocd login <url>:<port> --username <username> --password <password>
@@ -39,9 +50,9 @@ Example Output:
 
 ![alt text](images/image-1.png)
 
-### List All ArgoCD Accounts
+## Step 3: Listing Existing User Accounts
 
-To display all existing ArgoCD user accounts, run:
+To see all current ArgoCD user accounts, I ran:
 
 ```bash
 argocd account list
@@ -50,36 +61,40 @@ Example Output:
 
 ![alt text](images/image-2.png)
 
-### Remove the User from ArgoCD ConfigMap
+## Step 4: Removing the User from ArgoCD ConfigMap
 
-Retrieve the argocd-cm ConfigMap and save it to a local file:
+### 4.1 Retrieving the argocd-cm ConfigMap
+
+I saved the configuration to a local file:
 
 ```bash
 kubectl get configmap argocd-cm -n argocd -o yaml > argocd-cm.yaml
 ```
 
-Open the argocd-cm.yaml file in a text editor and remove the following entry under the data section:
+### 4.2 Editing the ConfigMap
+
+I opened the argocd-cm.yaml file and removed the entry for the user under the data section:
 
 ```bash
 data:
   accounts.testuser: login
 ```
 
-Apply the updated ConfigMap:
+### 4.3 Applying the Updated ConfigMap
 
 ```bash
 kubectl apply -n argocd  -f argocd-cm.yaml
 ```
 
-### Verify Account Removal
+## Step 5: Verifying User Removal
 
-Re-enter the ArgoCD server pod (if you exited earlier):
+If I exited the ArgoCD pod, I re-entered it using:
 
 ```bash
 kubectl exec -it <argocd-server-pod-name> -n argocd -- /bin/bash
 ```
 
-Run the following command to check if the removed account is still listed:
+I then ran the following command to confirm the user was removed:
 
 ```bash
 argocd account list
@@ -89,15 +104,19 @@ Expected Output:
 
 ![alt text](images/image-3.png)
 
-### Update RBAC Configuration
+## Step 6: Updating RBAC Configuration
 
-Retrieve the argocd-rbac-cm ConfigMap and save it locally:
+### 6.1 Retrieving the argocd-rbac-cm ConfigMap
+
+I saved the RBAC configuration to a local file:
 
 ```bash
 kubectl get configmap argocd-rbac-cm -n argocd -o yaml > argocd-rbac-cm.yml
 ```
 
-Open the argocd-rbac-cm.yml file and remove the following entry under the data section:
+### 6.2 Editing the RBAC Configuration
+
+I removed the user-specific role entry from the data section:
 
 ```bash
 data:
@@ -106,27 +125,36 @@ data:
     g, crunchops, role:readonly
 ```
 
-Apply the updated RBAC configuration:
+### 6.3 Applying the Updated RBAC Configuration
 
 ```bash
 kubectl apply -n argocd -f argocd-rbac-cm.yml
 ```
 
-### Remove User Credentials from Secrets
+## Step 7: Removing User Credentials from Secrets
 
-Retrieve the argocd-secret resource and save it locally:
+### 7.1 Retrieving the argocd-secret Resource
+
+I saved the secrets to a local file:
 
 ```bash
 kubectl get secrets argocd-secret -n argocd -o yaml > argocd-secret.yml
 ```
 
-Open the argocd-secret.yml file and remove the user-specific entry under the data section.
+### 7.2 Editing the Secret Configuration
+
+I opened argocd-secret.yml and removed the user-specific entry under the data section.
 
 ![alt text](images/image-4.png)
 
-Apply the updated secret configuration:
+### 7.3 Applying the Updated Secret Configuration
 
 ```bash
 kubectl apply -n argocd -f argocd-secret.yml
 ```
+
+## Conclusion
+
+By following these steps, I successfully removed the user from ArgoCD, ensuring their login credentials, role-based access, and related configurations were fully deleted. Verifying each step helped confirm the changes were correctly applied, maintaining a secure and well-managed ArgoCD environment.
+
 
