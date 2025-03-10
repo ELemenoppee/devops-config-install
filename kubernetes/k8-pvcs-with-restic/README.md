@@ -1,7 +1,6 @@
 # 😈 Backing Up Kubernetes PVCs to AWS S3 using Restic: On-Demand and Automated Solutions 😈
 
-
-![alt text](images/image-2.png)
+![alt text](images/image.png)
 
 ## Introduction
 
